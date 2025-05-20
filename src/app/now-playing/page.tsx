@@ -14,7 +14,7 @@ export default async function NowPlayingPage({ searchParams }: Props) {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Popular Movies (Page {page})</h1>
+      <h1 className="text-2xl font-bold mb-4">Now playing Movies </h1>
       <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
         {data.results.map((m) => (
           <CardMovie

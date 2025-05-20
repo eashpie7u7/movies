@@ -1,16 +1,25 @@
-import { getMovieDetails } from '../../../services/movies/index';
-import {  getMovieRecommendations } from '../../../services/movies/index';
+import { getMovieDetails, getMovieRecommendations } from '../../../services/movies';
 import Link from 'next/link';
 import Image from 'next/image';
-import {FavoriteButton} from "../../../components/FavoriteButton"
+import { FavoriteButton } from '../../../components/FavoriteButton';
 
-interface Props { params: { id: string } }
+interface Movie {
+  id: number;
+  title: string;
+  overview: string;
+  poster_path: string;
+  release_date: string;
+  vote_average: number;
+}
 
-export default async function MovieDetailPage({ params }: Props) {
+export default async function MovieDetailPage({
+  params,
+}: {
+  params: { id: string };
+}) {
   const movieId = Number(params.id);
   const movie = await getMovieDetails(movieId);
   const recommendations = await getMovieRecommendations(movieId);
-
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
@@ -24,32 +33,40 @@ export default async function MovieDetailPage({ params }: Props) {
           className="rounded-lg"
         />
         <div>
-          <p className='font-bold text-2xl'><strong>Release Date:</strong> {movie.release_date}</p>
-          <p className='font-bold text-xl'><strong> 🎀 Score:</strong> {movie.vote_average}</p>
+          <p className="font-bold text-2xl">
+            <strong>Release Date:</strong> {movie.release_date}
+          </p>
+          <p className="font-bold text-xl">
+            <strong>🎀 Score:</strong> {movie.vote_average}
+          </p>
           <p className="mt-4">{movie.overview}</p>
           <FavoriteButton movieId={movie.id} />
-
         </div>
       </div>
+
       {recommendations.results.length > 0 && (
         <div>
-          <h2 className="py-12 text-2xl font-semibold mb-4">Recommended Movies</h2>
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-12 ">
-            {recommendations.results.slice(0, 10).map((rec) => (
+          <h2 className="py-12 text-2xl font-semibold mb-4">
+            Recommended Movies
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-12">
+            {recommendations.results.slice(0, 10).map((rec: Movie) => (
               <Link
                 key={rec.id}
                 href={`/movie/${rec.id}`}
-                className="bg-pink-100 w-40 p-1 h-[280] rounded-lg overflow-hidden shadow hover:shadow-lg transition"
+                className="bg-pink-100 w-40 p-1 h-[280px] rounded-lg overflow-hidden shadow hover:shadow-lg transition"
               >
                 <Image
                   src={`https://image.tmdb.org/t/p/w200${rec.poster_path}`}
                   alt={rec.title}
-                  width={400}
-                  height={300}
+                  width={200}
+                  height={280}
                   className="w-full object-cover"
                 />
                 <div className="p-2">
-                  <h3 className="text-sm  font-bold text-pink-400">{rec.title}</h3>
+                  <h3 className="text-sm font-bold text-pink-400">
+                    {rec.title}
+                  </h3>
                 </div>
               </Link>
             ))}
