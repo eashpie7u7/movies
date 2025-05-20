@@ -33,7 +33,7 @@ export default async function MovieDetailPage({ params }: Props) {
       </div>
       {recommendations.results.length > 0 && (
         <div>
-          <h2 className="text-2xl font-semibold mb-4">Recommended Movies</h2>
+          <h2 className="py-12 text-2xl font-semibold mb-4">Recommended Movies</h2>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-12 ">
             {recommendations.results.slice(0, 10).map((rec) => (
               <Link
