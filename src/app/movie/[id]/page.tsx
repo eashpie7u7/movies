@@ -20,6 +20,7 @@ export default async function MovieDetailPage({
   const movieId = Number(params.id);
   const movie = await getMovieDetails(movieId);
   const recommendations = await getMovieRecommendations(movieId);
+  //cinst id params 
 
   return (
     <div className="p-6 max-w-4xl mx-auto">

@@ -8,7 +8,7 @@ interface Props {
   searchParams: { page?: string };
 }
 
-export default async function PopularPage({ searchParams }: Props) {
+export default async function TopRated({ searchParams }: Props) {
   const page = Number(searchParams.page || '1');
   const data: GetTopRatedMoviesResponse = await getTopRatedMovies(page);
 
@@ -30,7 +30,7 @@ export default async function PopularPage({ searchParams }: Props) {
       <div className="flex justify-between mt-8 px-6">
         {page > 1 ? (
           <Link
-            href={`/now-playing?page=${page - 1}`}
+            href={`/top-rated?page=${page - 1}`}
             className="inline-block bg-pink-200 text-rose-500 font-bold px-6 py-2 rounded-2xl shadow-md hover:shadow-lg hover:scale-105 transition-transform duration-200"
           >
             ← Anterior
@@ -41,7 +41,7 @@ export default async function PopularPage({ searchParams }: Props) {
 
         {page < data.total_pages && (
           <Link
-            href={`/now-playing?page=${page + 1}`}
+            href={`/top-rated?page=${page + 1}`}
             className="inline-block bg-pink-200 text-rose-500 font-bold px-6 py-2 rounded-2xl shadow-md hover:shadow-lg hover:scale-105 transition-transform duration-200"
           >
             Siguiente →
