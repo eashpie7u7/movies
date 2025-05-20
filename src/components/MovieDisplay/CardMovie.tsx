@@ -20,21 +20,21 @@ export function CardMovie({
   return (
     <Link
       href={`/movie/${id}`}
-      className="block  bg-pink-100 rounded-t-3xl overflow-hidden shadow hover:shadow-lg transform transition-transform duration-300 hover:scale-105"
+      className="block p-4 bg-pink-100 h-[450px]  rounded-3xl overflow-hidden shadow hover:shadow-lg transform transition-transform duration-300 hover:scale-105"
     >
       <Image
         src={`https://image.tmdb.org/t/p/w500${posterPath}`}
         alt={title}
         width={360} 
         height={300} 
-        className="rounded-t-2xl object-cover w-full h-4/5"
+        className="rounded-t-2xl object-cover w-full h-[300px]"
         priority={false}
       />
 
       <div className="p-4 bg-pink-100">
-        <h3 className="font-bold text-2xl">{title}</h3>
+        <h3 className="font-bold text-lg text-rose-500">{title}</h3>
         <p className="text-sm text-gray-500">{releaseDate}</p>
-        <p className="text-sm font-bold">⭐ Score {score.toFixed(1)}</p>
+        <p className="text-lg font-bold">🎀 Score {score.toFixed(1)}</p>
         
       </div>
     </Link>

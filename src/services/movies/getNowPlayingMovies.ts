@@ -6,10 +6,10 @@ export const getNowPlayingMovies = async () => {
   await api
     .get(endpoint)
     .then((data) => {
-      res = data.data; // data solo es el nombre de la respuesta
+      res = data.data; 
     })
     .catch((err) => {
-      res = err.response; // response trae todo la info del error
+      res = err.response; 
     });
   return res;
 };
