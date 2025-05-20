@@ -4,12 +4,6 @@ import { getPopularMovies } from "@/services/movies/getPopularMovies";
 import { getNowPlayingMovies } from "@/services/movies/getNowPlayingMovies";
 import { CardMovie } from "@/components/MovieDisplay/CardMovie";
 import Link from "next/link";
-import { Pacifico } from "next/font/google";
-
-const pacifico = Pacifico({
-  subsets: ["latin"],
-  weight: ["400"],
-});
 
 export default async function HomePage() {
   const [topRated, popular, nowPlaying] = await Promise.all([
@@ -18,7 +12,15 @@ export default async function HomePage() {
     getNowPlayingMovies(),
   ]);
 
-  const heroMovie = nowPlaying.results[0];
+  const heroMovie = nowPlaying?.results?.[0];
+
+  if (!heroMovie) {
+    return (
+      <main className="min-h-screen flex items-center justify-center text-red-500">
+        <p>Movie not found</p>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-white text-black">
@@ -44,25 +46,22 @@ export default async function HomePage() {
           </Link>
         </div>
       </section>
-      <div >
+      <div>
         <MovieRow
-          title =" Now Playing"
+          title=" Now Playing"
           href="/now-playing"
           movies={nowPlaying.results.slice(0, 5)}
-          titleClassName={pacifico.className}
         />
 
         <MovieRow
           title="Popular movies"
           href="/popular"
           movies={popular.results.slice(0, 5)}
-          titleClassName={pacifico.className}
         />
         <MovieRow
           title="Top Rated movies"
           href="/top-rated"
           movies={topRated.results.slice(0, 5)}
-
         />
       </div>
     </main>
