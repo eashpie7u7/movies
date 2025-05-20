@@ -1,7 +1,11 @@
-import { getMovieDetails, getMovieRecommendations } from '../../../services/movies';
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FavoriteButton } from '../../../components/FavoriteButton';
+import { getMovieDetails, getMovieRecommendations } from '../../../services/movies';
 
 interface Movie {
   id: number;
@@ -12,15 +16,42 @@ interface Movie {
   vote_average: number;
 }
 
-export default async function MovieDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default function MovieDetailPage() {
+  const params = useParams();
   const movieId = Number(params.id);
-  const movie = await getMovieDetails(movieId);
-  const recommendations = await getMovieRecommendations(movieId);
-  //cinst id params 
+  
+  const [movie, setMovie] = useState<Movie | null>(null);
+  const [recommendations, setRecommendations] = useState<Movie[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchMovieData() {
+      try {
+        setIsLoading(true);
+        const movieData = await getMovieDetails(movieId);
+        const recommendationsData = await getMovieRecommendations(movieId);
+        
+        setMovie(movieData);
+        setRecommendations(recommendationsData.results || []);
+      } catch (error) {
+        console.error('Error fetching movie data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    if (movieId) {
+      fetchMovieData();
+    }
+  }, [movieId]);
+
+  if (isLoading) {
+    return <div className="p-6 max-w-4xl mx-auto">Loading...</div>;
+  }
+
+  if (!movie) {
+    return <div className="p-6 max-w-4xl mx-auto">Movie not found</div>;
+  }
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
@@ -45,13 +76,13 @@ export default async function MovieDetailPage({
         </div>
       </div>
 
-      {recommendations.results.length > 0 && (
+      {recommendations.length > 0 && (
         <div>
           <h2 className="py-12 text-2xl font-semibold mb-4">
             Recommended Movies
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-12">
-            {recommendations.results.slice(0, 10).map((rec: Movie) => (
+            {recommendations.slice(0, 10).map((rec: Movie) => (
               <Link
                 key={rec.id}
                 href={`/movie/${rec.id}`}

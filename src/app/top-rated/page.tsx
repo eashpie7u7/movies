@@ -1,22 +1,65 @@
-import React from "react";
+'use client';
+
+import React, { Suspense } from "react";
+import Link from 'next/link';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { GetTopRatedMoviesResponse } from '@/services/movies/types';
 import { getTopRatedMovies } from "@/services/movies/getTopRatedMovies";
-import {CardMovie} from '../../components/MovieDisplay/CardMovie';
-import Link from 'next/link';
+import { CardMovie } from '../../components/MovieDisplay/CardMovie';
 
-interface Props {
-  searchParams: { page?: string };
-}
 
-export default async function TopRated({ searchParams }: Props) {
-  const page = Number(searchParams.page || '1');
-  const data: GetTopRatedMoviesResponse = await getTopRatedMovies(page);
+const LoadingUI = () => (
+  <div className="p-6">
+    <h1 className="text-2xl font-bold mb-4">Top rated movies</h1>
+    <div className="flex justify-center items-center min-h-[300px]">
+      <p>Loading...</p>
+    </div>
+  </div>
+);
+
+function TopRatedContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const page = Number(searchParams.get('page') || '1');
+  const [moviesData, setMoviesData] = React.useState<GetTopRatedMoviesResponse | null>(null);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const fetchMovies = async () => {
+      setLoading(true);
+      try {
+        const data: GetTopRatedMoviesResponse = await getTopRatedMovies(page);
+        setMoviesData(data);
+      } catch (error) {
+        console.error("Error fetching top rated movies:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMovies();
+  }, [page]);
+
+  const createPageUrl = (pageNumber: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('page', pageNumber.toString());
+    return `${pathname}?${params.toString()}`;
+  };
+
+  if (loading) {
+    return <LoadingUI />;
+  }
+
+  if (!moviesData) {
+    return <div className="p-6">No data available</div>;
+  }
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Top rated movies </h1>
+      <h1 className="text-2xl font-bold mb-4">Top rated movies</h1>
       <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
-        {data.results.map(m => (
+        {moviesData.results.map(m => (
           <CardMovie
             key={m.id}
             id={m.id}
@@ -30,18 +73,18 @@ export default async function TopRated({ searchParams }: Props) {
       <div className="flex justify-between mt-8 px-6">
         {page > 1 ? (
           <Link
-            href={`/top-rated?page=${page - 1}`}
+            href={createPageUrl(page - 1)}
             className="inline-block bg-pink-200 text-rose-500 font-bold px-6 py-2 rounded-2xl shadow-md hover:shadow-lg hover:scale-105 transition-transform duration-200"
           >
             ← Anterior
           </Link>
         ) : (
-          <div /> 
+          <div />
         )}
 
-        {page < data.total_pages && (
+        {moviesData.total_pages > page && (
           <Link
-            href={`/top-rated?page=${page + 1}`}
+            href={createPageUrl(page + 1)}
             className="inline-block bg-pink-200 text-rose-500 font-bold px-6 py-2 rounded-2xl shadow-md hover:shadow-lg hover:scale-105 transition-transform duration-200"
           >
             Siguiente →
@@ -49,5 +92,13 @@ export default async function TopRated({ searchParams }: Props) {
         )}
       </div>
     </div>
+  );
+}
+
+export default function TopRated() {
+  return (
+    <Suspense fallback={<LoadingUI />}>
+      <TopRatedContent />
+    </Suspense>
   );
 }

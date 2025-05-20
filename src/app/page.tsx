@@ -14,7 +14,7 @@ const pacifico = Pacifico({
 export default async function HomePage() {
   const [topRated, popular, nowPlaying] = await Promise.all([
     getTopRatedMovies(1),
-    getPopularMovies(1),
+    getPopularMovies(),
     getNowPlayingMovies(),
   ]);
 
