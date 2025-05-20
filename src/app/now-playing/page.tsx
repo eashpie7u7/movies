@@ -1,13 +1,24 @@
 'use client';
 
-import React from "react";
+import React, { Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { GetNowPlayingMoviesResponse } from "@/services/movies/types";
 import { getNowPlayingMovies } from "@/services/movies";
 import { CardMovie } from "../../components/MovieDisplay/CardMovie";
 
-export default function NowPlayingPage() {
+
+const LoadingUI = () => (
+  <div className="p-6">
+    <h1 className="text-2xl font-bold mb-4">Now playing Movies</h1>
+    <div className="flex justify-center items-center min-h-[300px]">
+      <p>Loading...</p>
+    </div>
+  </div>
+);
+
+
+function NowPlayingContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -32,13 +43,13 @@ export default function NowPlayingPage() {
   }, [page]);
 
   const createPageUrl = (pageNumber: number) => {
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams.toString());
     params.set('page', pageNumber.toString());
     return `${pathname}?${params.toString()}`;
   };
 
   if (loading) {
-    return <div className="p-6">Loading...</div>;
+    return <LoadingUI />;
   }
 
   if (!moviesData) {
@@ -81,5 +92,14 @@ export default function NowPlayingPage() {
         )}
       </div>
     </div>
+  );
+}
+
+
+export default function NowPlayingPage() {
+  return (
+    <Suspense fallback={<LoadingUI />}>
+      <NowPlayingContent />
+    </Suspense>
   );
 }
